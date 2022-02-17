@@ -7,6 +7,7 @@ using LibApp.Models;
 using LibApp.ViewModels;
 using LibApp.Data;
 using Microsoft.EntityFrameworkCore;
+using LibApp.Interfaces;
 
 namespace LibApp.Controllers
 {
@@ -14,32 +15,31 @@ namespace LibApp.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public BooksController(ApplicationDbContext context)
+        private readonly IBookRepository _bookRepository;
+
+        public BooksController(ApplicationDbContext context, IBookRepository bookRepository)
         {
             _context = context;
+            _bookRepository = bookRepository;
         }
 
         public IActionResult Index()
         {
-            var books = _context.Books
-                .Include(b => b.Genre)
-                .ToList();
+            var books = _bookRepository.GetBooks().ToList();
 
             return View(books);
         }
 
         public IActionResult Details(int id)
         {
-            var book = _context.Books
-                .Include(b => b.Genre)
-                .SingleOrDefault(b => b.Id == id);
+            var book = _bookRepository.GetBooks().SingleOrDefault(b => b.Id == id);
 
             return View(book);
         }
 
         public IActionResult Edit(int id)
         {
-            var book = _context.Books.SingleOrDefault(b => b.Id == id);
+            var book = _bookRepository.GetBooks().SingleOrDefault(b => b.Id == id);
             if (book == null)
             {
                 return NotFound();
@@ -56,11 +56,9 @@ namespace LibApp.Controllers
 
         public IActionResult New()
         {
-            var genres = _context.Genre.ToList();
-
             var viewModel = new BookFormViewModel
             {
-                Genres = genres
+                Genres = _context.Genre.ToList()
             };
 
             return View("BookForm", viewModel);
@@ -95,6 +93,13 @@ namespace LibApp.Controllers
             }
 
             return RedirectToAction("Index", "Books");
+        }
+
+        [HttpGet]
+        [Route("api/books")]
+        public IList<Book> GetBooks()
+        {
+            return _bookRepository.GetBooks().ToList();
         }
     }
 }
