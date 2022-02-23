@@ -14,5 +14,7 @@ namespace LibApp.Interfaces
         void UpdateBook(Book book);
         void DeleteBook(int bookId);
         void Save();
+        IEnumerable<Book> BooksWhere();
+        Task AsyncGetBookById(int bookId);
     }
 }

@@ -30,5 +30,12 @@ namespace LibApp.Repositories
         public void UpdateBook(Book book) => _context.Books.Update(book);
 
         public void Save() => _context.SaveChanges();
+
+        public async Task AsyncGetBookById(int bookId) => await _context.Books.SingleOrDefaultAsync(b => b.Id == bookId);
+
+        public IEnumerable<Book> BooksWhere()
+        {
+            return _context.Books.Where(b => b.NumberAvailable > 0);
+        }
     }
 }

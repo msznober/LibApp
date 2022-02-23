@@ -19,14 +19,13 @@
         </tr>
     </thead>
     <tbody>
-            
     </tbody>
 </table>
 
 
-@section Scripts 
-{ 
-    <script>
+@section Scripts
+{
+        <script>
         $(document).ready(function () {
             $("#customers").DataTable({
                 ajax: {
@@ -37,7 +36,7 @@
                     {
                         data: "name",
                         render: function (data, type, customer) {
-                            return "<a href='customers/edit/" + customer.id + "'>" + customer.name + "</a>";
+                            return "<a href='customers/details/" + customer.id + "'>" + customer.name + "</a>";
                         }
                     },
                     {
@@ -55,10 +54,8 @@
     </script>
     <script>
         $(document).ready(function () {
-
             var table = $("#customers").DataTable();
             $("#customers").on("click", ".js-delete", function () {
-
                 var button = $(this);
                 bootbox.confirm({
                     message: "Confirm customer deletion?",

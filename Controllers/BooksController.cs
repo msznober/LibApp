@@ -32,14 +32,15 @@ namespace LibApp.Controllers
 
         public IActionResult Details(int id)
         {
-            var book = _bookRepository.GetBooks().SingleOrDefault(b => b.Id == id);
+            var book = _bookRepository.GetBookById(id);
+
 
             return View(book);
         }
 
         public IActionResult Edit(int id)
         {
-            var book = _bookRepository.GetBooks().SingleOrDefault(b => b.Id == id);
+            var book = _bookRepository.GetBookById(id);
             if (book == null)
             {
                 return NotFound();
@@ -56,21 +57,25 @@ namespace LibApp.Controllers
 
         public IActionResult New()
         {
+            var genres = _context.Genre.ToList();
+
             var viewModel = new BookFormViewModel
             {
-                Genres = _context.Genre.ToList()
+                Genres = genres
             };
 
             return View("BookForm", viewModel);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Save(Book book)
         {
+
             if (book.Id == 0)
             {
                 book.DateAdded = DateTime.Now;
-                _context.Books.Add(book);
+                _bookRepository.AddBook(book);
             }
             else
             {
@@ -85,7 +90,7 @@ namespace LibApp.Controllers
 
             try
             {
-                _context.SaveChanges();
+                _bookRepository.Save();
             }
             catch (DbUpdateException e)
             {
@@ -95,11 +100,6 @@ namespace LibApp.Controllers
             return RedirectToAction("Index", "Books");
         }
 
-        [HttpGet]
-        [Route("api/books")]
-        public IList<Book> GetBooks()
-        {
-            return _bookRepository.GetBooks().ToList();
-        }
+
     }
 }

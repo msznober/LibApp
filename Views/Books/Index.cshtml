@@ -1,9 +1,7 @@
 @model IEnumerable<LibApp.Models.Book>
 
-@{
-    ViewBag.Title = "Books";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ ViewBag.Title = "Books";
+                Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <h2>Books</h2>
 
@@ -13,20 +11,66 @@
 
 <table class="table table-bordered table-hover">
     <thead>
-    <tr>
-        <th>Book</th>
-        <th colspan="2">Genre</th>
-    </tr>
+        <tr>
+            <th>Book</th>
+            <th colspan="2">Genre</th>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var book in Model)
-    {
-        <tr>
-            <td><a asp-action="Edit" asp-route-id="@book.Id">@Html.DisplayFor(modelItem => book.Name)</a></td>
-            <td>@Html.DisplayFor(modelItem => book.Genre.Name)</td>
-            <td><a asp-action="Details" asp-route-id="@book.Id">Details</a></td>
+        @foreach (var book in Model)
+        {
+            <tr>
+                <td><a asp-action="Edit" asp-route-id="@book.Id">@Html.DisplayFor(modelItem => book.Name)</a></td>
+                <td>@Html.DisplayFor(modelItem => book.Genre.Name)</td>
+                <td><a asp-action="Details" asp-route-id="@book.Id">Details</a></td>
+                <td>
+                    <button class="btn btn-secondary js-delete" data-book-id=@book.Id>Delete</button>
+                </td>
 
-        </tr>
-    }
+            </tr>
+        }
     </tbody>
 </table>
+
+@section Scripts
+{
+    <script>
+    $(document).ready(function () {
+        $("#books").DataTable();
+    });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#books").on("click",".js-delete", function () {
+
+
+
+                var button = $(this);
+                bootbox.confirm({
+                    message: "Confirm book delete? ",
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-success'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result) {
+                            $.ajax({
+                                url: "api/books/" + button.attr("data-book-id"),
+                                method: "DELETE",
+                                success: function () {
+                                    button.parents("tr").remove();
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}
