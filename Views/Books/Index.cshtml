@@ -20,7 +20,7 @@
         @foreach (var book in Model)
         {
             <tr>
-                <td><a asp-action="Edit" asp-route-id="@book.Id">@Html.DisplayFor(modelItem => book.Name)</a></td>
+                <td><a asp-action="Details" asp-route-id="@book.Id">@Html.DisplayFor(modelItem => book.Name)</a></td>
                 <td>@Html.DisplayFor(modelItem => book.Genre.Name)</td>
                 <td><a asp-action="Details" asp-route-id="@book.Id">Details</a></td>
                 <td>
@@ -36,9 +36,35 @@
 {
     <script>
     $(document).ready(function () {
-        $("#books").DataTable();
-    });
+            $("#books").DataTable({
+                ajax: {
+                    url: "/api/books",
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: "name",
+                        render: function (data, type, book) {
+                            return "<a href='books/details/" + book.id + "'>" + book.name + "</a>";
+                        }
+                    },
+                    {
+                        data: "authorName"
+                    },
+                    {
+                        data: "genre.name"
+                    }
+                    {
+                        data: "id",
+                        render: function (data) {
+                            return "<button class='btn btn-secondary js-delete' data-button-id=" + data + ">Delete</button>"
+                        }
+                    }
+                ]
+            });
+        });
     </script>
+
     <script>
         $(document).ready(function () {
             $("#books").on("click",".js-delete", function () {
